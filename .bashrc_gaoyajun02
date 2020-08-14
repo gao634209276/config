@@ -1,0 +1,33 @@
+# export MYVIMRC=/home/sankuai/.vimrc_gaoyajun02
+unalias nvim
+alias easy_submit='python /opt/meituan/saron/avocado/spark_submit/easy_submit.py'
+alias test_submit='python /opt/meituan/gaoyajun02/crowd_submit/easy_submit.py'
+alias tl='tmux ls'
+alias ta='tmux attach-session -t'
+alias tn='tmux new-session -s'
+alias tk='tmux kill-session -t'
+export TMUX_TMPDIR=$HOME/$OWNER/.tmux
+if [ -z $TMUX ]; then
+    export TERM=xterm-256color
+else
+    export TERM=screen-256color
+fi
+# export EDITOR=/opt/meituan/neovim/bin/nvim
+# export XDG_CONFIG_HOME=$HOME/$OWNER/.config
+export EDITOR=/home/sankuai/bin/nvim
+export PATH=$SPARK_HOME/bin:$PATH
+# export PATH=/opt/meituan/node/bin:$SPARK_HOME/bin:$PATH
+# export PATH=/opt/meituan/neovim/bin:$PATH
+# export EDITOR=/opt/meituan/neovim/bin/vim
+# export PATH=/opt/meituan/neovim/bin:$PATH
+# export LD_LIBRARY_PATH=/opt/meituan/gcc-4.8.2/lib:$LD_LIBRARY_PATH
+# export LD_LIBRARY_PATH=/opt/meituan/miniconda2/envs/vim/lib:$LD_LIBRARY_PATH
+# export LD_LIBRARY_PATH=/opt/meituan/glibc-2.14/lib/:/usr/local/java/jre/lib/amd64/server:/usr/local/lib
+
+# conda activate crowd_pkg
+# export PYTHONPATH=/home/sankuai/gaoyajun02/avocado/sjs/dspCrowdPkg/dist/dspCrowdPkg-1.0-py2.7.egg:$PYTHONPATH
+# cd /home/sankuai/gaoyajun02/giantres/avocado/dsp_target/az_unlim_app_info
+# cd /home/sankuai/gaoyajun02/avocado/sjs/dspCrowdPkg
+# alias nvim='PATH=/opt/meituan/node/bin:$PATH LD_LIBRARY_PATH=/opt/meituan/glibc-2.14/lib /opt/meituan/nvim/bin/nvim'
+# alias nvim='PATH=/opt/meituan/nvim-linux64/bin:$PATH LD_LIBRARY_PATH=/opt/meituan/nvim-linux64/lib /opt/meituan/nvim/bin/nvim'
+# tmux attach -t $OWNER || tmux  new -s $OWNER
