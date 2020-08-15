@@ -1,14 +1,11 @@
 " plug settings
-" === Vim-colors-solarized
-if !has('nvim') && has_key(g:plugs, 'vim-colors-solarized')
-    colorscheme solarized
-endif
 " === Vim-solarized8
 if has('nvim') && has_key(g:plugs, 'vim-solarized8')
     colorscheme solarized8_flat
 endif
 let g:solarized_use16 = 1
 let g:solarized_old_cursor_style = 1
+
 " === Airline
 " let g:airline_extensions = []
 let g:airline#extensions#tabline#enabled = 1
@@ -26,7 +23,8 @@ let g:airline#extensions#branch#enabled=1
 " let g:airline_theme='solarized'
 " let g:airline#extensions#tagbar#flags = 'f'
 " let g:airline#extensions#tmuxline#enabled = 0
-" === Llightline
+
+" === Lightline
 let g:lightline = {
       \ 'colorscheme' : 'solarized',
       \ 'active': {
@@ -121,7 +119,8 @@ let g:lightline#bufferline#filename_modifier = ':t'
 let g:lightline#bufferline#unnamed           = '[No Name]'
 let g:lightline#bufferline#clickable         = 1
 
-let g:lightline.tabline            = {'left': [['buffers']], 'right': [['close']]}
+" let g:lightline.tabline            = {'left': [['buffers']], 'right': [['close']]}
+let g:lightline.tabline            = {'left': [['buffers']], 'right': []}
 let g:lightline.component_raw      = {'buffers': 1}
 let g:lightline.component_expand   = {'buffers': 'lightline#bufferline#buffers'}
 let g:lightline.component_type     = {'buffers': 'tabsel', 'close': 'raw'}
@@ -176,7 +175,8 @@ let g:bookmark_no_default_key_mappings = 1
 " let g:bookmark_location_list = 1
 
 " === Git
-nnoremap <Leader>gd :Gdiffsplit!<CR>
+" nnoremap <Leader>gd :Gdiffsplit!<CR>
+nnoremap <Leader>gd :Gvdiffsplit!<CR>
 let g:fugitive_no_maps = 1
 
 
@@ -439,7 +439,7 @@ nnoremap <silent><nowait> \c  :<C-u>CocList commands<cr>
 " Find symbol of current document.
 nnoremap <silent><nowait> \o  :<C-u>CocList outline<cr>
 " Search workspace symbols. need Ctags
-nnoremap <silent><nowait> \s  :<C-u>CocList -I symbols<cr> 
+nnoremap <silent><nowait> \s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
 nnoremap <silent><nowait> ]c  :<C-u>CocNext<CR>
 " Do default action for previous item.
@@ -456,10 +456,10 @@ let g:coc_fzf_opts = ['--layout=reverse']
 nnoremap <silent> <Leader>fD :<C-u>CocFzfList diagnostics<CR>
 nnoremap <silent> <Leader>fd :<C-u>CocFzfList diagnostics --current-buf<CR>
 nnoremap <silent> <Leader>fy :<C-u>CocFzfList yank<CR>
-nnoremap <silent> <Leader>fl :<C-u>CocFzfList location<CR>
+nnoremap <silent> <Leader>fc :<C-u>CocFzfList location<CR>
 nnoremap <silent> <Leader>fs :<C-u>CocFzfList symbols<CR>
 " Preview not Support
-" nnoremap <silent> <Leader>fF :<C-u>CocFzfList<CR>
+nnoremap <silent> <Leader>fF :<C-u>CocFzfList<CR>
 " nnoremap <silent> <Leader>fo :<C-u>CocFzfList outline<CR>
 " nnoremap <silent> <Leader>fR :<C-u>CocFzfListResume<CR>
 

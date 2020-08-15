@@ -1,4 +1,6 @@
-" Support multi-user custom settings, and the settings is user-isolated
+" === Support multi-user custom settings, and the settings is user-isolated
+let $OWNER = empty($OWNER) ? 'sankuai' : $OWNER
+let $HOME = '/home/sankuai'
 if exists('$OWNER') && $OWNER != 'sankuai' && filereadable(expand('~/$OWNER/.config/nvim/init.vim'))
     " Reset Vim-Plug path for user
     let g:vim_home = '~/$OWNER/.config/nvim'
@@ -20,17 +22,17 @@ if exists('$OWNER') && $OWNER != 'sankuai' && filereadable(expand('~/$OWNER/.con
     set runtimepath+=~/$OWNER/.config/nvim/after
 endif
 
+" === Install Plugins with Vim-Plug
 " Default Plug Path
 let g:vim_home = exists('g:vim_home') ? g:vim_home : '~/.config/nvim'
 let g:vim_plug_path = g:vim_home.'/autoload/plug.vim'
 let g:vim_plugged_path = g:vim_home.'/plugged'
-
-" === Install Plugins with Vim-Plug
 if !filereadable(expand(g:vim_plug_path))
     let s:vim_plug_git = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     silent execute "!curl -fLo ".g:vim_plug_path." --create-dirs ".s:vim_plug_git
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+
 call plug#begin(g:vim_plugged_path)
 " Plug 'yianwillis/vimcdoc'
 Plug 'altercation/vim-colors-solarized'
@@ -49,10 +51,8 @@ Plug 'preservim/nerdtree', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTr
 " Plug 'Xuyuanp/nerdtree-git-plugin', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
 " Plug 'phongvcao/nerdtree-yank-plugin', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
 Plug 'junegunn/fzf', {'dir': '~/.fzf','do': './install --all'}
-" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim' " needed for previews
-Plug 'MattesGroeger/vim-bookmarks'
-
+" Plug 'MattesGroeger/vim-bookmarks'
 
 Plug 'mbbill/undotree'
 Plug 'vim-scripts/bufonly.vim'
@@ -64,9 +64,10 @@ Plug 'tpope/vim-fugitive'
 " Plug 'jiangmiao/auto-pairs'
 " Plug 'itchyny/vim-cursorword'
 " Plug 'easymotion/vim-easymotion'
-" Plug 'tpope/vim-surround' " type yskw' to wrap the word with '' or type cs'` to change 'word' to `word`
+Plug 'tpope/vim-surround' " type yskw' to wrap the word with '' or type cs'` to change 'word' to `word`
 
 " Plug 'derekwyatt/vim-scala'
+
 " Tmux
 if exists('$TMUX')
     Plug 'edkolev/tmuxline.vim'
@@ -82,7 +83,7 @@ if has('nvim')
 endif
 call plug#end()
 
-" Defalult settings / keymap / plug settings
+" === Defalult settings / keymap / plug settings
 let s:source_path = fnamemodify(expand('<sfile>'), ':h')
 execute 'source' s:source_path . '/base-settings.vim'
 execute 'source' s:source_path . '/plug-settings.vim'

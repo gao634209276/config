@@ -1,23 +1,16 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " === System
-" Mouse
-set mouse-=a
-" set mouse=a
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" === Moure, Clipboard
+set mouse=a
+" set mouse-=a
 " set mouse=nicr
 " Use the OS clipboard by default (on versions compiled with `+clipboard`)
-set clipboard=unnamed
-set clipboard+=unnamedplus
-" Clipboard provider for neovim
-" if executable('clipboard-provider')
+set clipboard^=unnamed,unnamedplus
 " Clipboard Provider pb/tmux/osc52/local copy, and pb/tmux/local for paste
-let $COPY_PROVIDERS='local'
-let $PASTE_PROVIDERS='local'
-" TMUX support osc52, and tty not need user permissions for copy remote to local
-if exists("$TMUX")
-    " let $COPY_PROVIDERS='tmux osc52 local'
-    " let $PASTE_PROVIDERS='tmux local'
-    let $COPY_PROVIDERS='tmux osc52'
-    let $PASTE_PROVIDERS='tmux'
-endif
+" Tmux support osc52, and Tmux tty not need user permissions for copy remote to local
+let $COPY_PROVIDERS  = empty($TMUX) ? 'local' : 'tmux osc52'
+let $PASTE_PROVIDERS = empty($TMUX) ? 'local' : 'tmux'
 let g:clipboard = {
   \ 'name': 'myClipboard',
   \     'copy': {
@@ -29,40 +22,38 @@ let g:clipboard = {
   \         '*': 'clipboard-provider paste',
   \     },
   \ }
-" endif
-" Colors
+" === Colors and Fonts
 " set t_Co=256
 " set t_Co=16
 if has("termguicolors")
-    " fix bug for vim
+    " Fix bug for vim
     set t_8f=^[[38;2;%lu;%lu;%lum
     set t_8b=^[[48;2;%lu;%lu;%lum
-    " enable true color
+    " Enable true color
     set termguicolors
 endif
-" Lang
+set background=dark
+try
+    " Plug vim-colors-solarized needed
+    colorscheme solarized
+catch
+endtry
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" === Vim user interface
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Ninimal number of screen lines to keep above and below the cursor
+set scrolloff=5
+" Language
 " set langmenu=en_US.UTF-8
 set langmenu=zh_CN.UTF-8
 language messages zh_CN.UTF-8
 language time zh_CN.UTF-8
-set autoread
 
-" === Main code display
-set number norelativenumber
-set cursorline
-set ambiwidth=double
-
-" === Editor behavior
-set expandtab
-set shiftwidth=4 tabstop=4 softtabstop=4
-" Prevent auto line split
-set textwidth=120
-set indentexpr= autoindent smartindent
-" Highlight tabs and trailing spaces
-set list listchars=tab:▸\ ,trail:▫
-set backspace=indent,eol,start
-set foldmethod=indent
-set foldlevel=99
+" === Files, backups and undo
+set nobackup
+set nowritebackup
+set noswapfile
 if has('persistent_undo')
     silent !mkdir -p ~/.local/share/nvim/undo
     set undofile
@@ -74,49 +65,66 @@ if has('nvim')
 else
     set viminfo+=n~/.viminfo
 endif
+" Set to auto read when a file is changed from the outside
+set autoread
+au FocusGained,BufEnter * checktime
+" Restore cursor position
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+" au BufRead,BufNewFile,BufEnter * cd %:p:h
 
-" === window behaviors
+" === Window, Buffers, StatusLine, CmdLine
 set splitright splitbelow
-" Format the status line
+set hidden
+set showtabline=2
+set showcmd
+" set switchbuf=usetab,newtab
+" Always show the status line
+set laststatus=2
 " set cmdheight=2
 " Show cmd mode autocomplete wildmenu
-" Show a navigable menu for tab completion
 set wildmode=longest,list,full
 set wildignore=log/**,node_modules/**,target/**,tmp/**,*.rbc
-" Searching options
+
+" === Searching options
 set hlsearch
+set showmatch
 exec "nohlsearch"
 set incsearch
 set ignorecase
 set smartcase
 
-" Ninimal number of screen lines to keep above and below the cursor
-set scrolloff=5
-" Auoto disable paste mode  when leave insert mode
-" au InsertLeave * set nopaste
-" Restore cursor position
-au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-" au BufRead,BufNewFile,BufEnter * cd %:p:h
-"
-" === buf
-" set switchbuf=usetab,newtab
-set hidden
-set showtabline=2
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" === Text, tab and indent related
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Main code display
+set number norelativenumber
+set cursorline
+set ambiwidth=double
+" Indent behavior
+set expandtab
+set shiftwidth=4 tabstop=4 softtabstop=4
+" Prevent auto line split
+set textwidth=120
+set indentexpr= autoindent smartindent
+" Highlight tabs and trailing spaces
+set list listchars=tab:▸\ ,trail:▫
+set backspace=indent,eol,start
+set whichwrap+=<,>,h,l
+set foldmethod=indent
+set foldlevel=99
+
 
 " === leader
 let mapleader = "\<space>"
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " === Basic Mappings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fix keybind name for Ctrl+Space
 map <Nul> <C-Space>
 map! <Nul> <C-Space>
-nnoremap <m-q> q
-nnoremap s <Nop>
-nnoremap S <Nop>
-vnoremap s <Nop>
-vnoremap S <Nop>
 
-" Save & quit
+" === Save, Quit, Source
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>w :w<CR>
 nnoremap <Leader>fw :w !sudo tee %<CR>
@@ -126,34 +134,31 @@ command! W w !sudo tee % > /dev/null
 " Source vimrc
 nnoremap <Leader>rc :source $MYVIMRC<CR>
 
-" Indent
+" === Indent
 nnoremap < <<
 nnoremap > >>
 vnoremap < <gv
 vnoremap > >gv
 
-" Search & Replace
-nnoremap <silent> <Leader><CR> :nohlsearch<CR>
+" === Search & Replace
+" Disabling the default s key
+nnoremap s <Nop>
+nnoremap S <Nop>
+vnoremap s <Nop>
+vnoremap S <Nop>
+" C-n: move between matches without leaving incremental search
+cnoremap <expr> <C-n> getcmdtype() == '/' \|\| getcmdtype() == '?' ? '<CR>/<C-r>/' : '<C-z>'
 " Quick substitute within selected area
 xnoremap sg :s//gc<Left><Left><Left>
-" C-n: move between matches without leaving incremental search
-" cnoremap <expr> <C-w> getcmdtype() == '/' \|\| getcmdtype() == '?' ? '<CR>/<C-r>/' : '<C-z>'
-" vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
-" vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
-
+nnoremap <silent> <Leader><CR> :nohlsearch<CR>
 nnoremap s/ :<C-u>%s//g<Left><Left>
 nnoremap <expr> s* ':<C-u>%s/\<' . expand('<cword>') . '\>//g<Left><Left>'
 nnoremap <expr> sg ':<C-u>%s/' . expand('<cword>') . '//g<Left><Left>'
-nnoremap S/ :<C-u>%s//gc<Left><Left><Left>
-nnoremap <expr> S* ':<C-u>%s/\<' . expand('<cword>') . '\>//gc<Left><Left><Left>'
-nnoremap <expr> Sg ':<C-u>%s/' . expand('<cword>') . '//gc<Left><Left><Left>'
-nnoremap ss :<C-u>silent! keeppatterns %substitute/\s\+$//e<CR>
+nnoremap ss :<C-u>silent keeppatterns %substitute/\s\+$//e<CR>
 " remove the windows ^M - when the encodings gets messed up
 nnoremap sm mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
 " nnoremap <leader>g :execute "grep -R " . shellescape("<cWORD>") . " ."<cr>
 
-" Disabling the default s key
-" noremap s <nop>
 " map si :set splitright<CR>:vsplit<CR>
 " map sn :set nosplitright<CR>:vsplit<CR>
 " map su :set nosplitbelow<CR>:split<CR>
@@ -185,8 +190,6 @@ inoremap <C-h> <Left>
 inoremap <C-l> <Right>
 inoremap <C-a> <Home>
 inoremap <C-e> <End>
-" inoremap <C-b> <C-o>b
-" inoremap <C-f> <C-o>f
 " Start new line fromk ny cursor position in insert-mode
 inoremap <C-n> <C-o>o
 
@@ -203,13 +206,12 @@ nnoremap <Leader>y :registers<CR>
 " Buffer
 " nnoremap <Leader>ba :bufdo bd<CR>
 nnoremap <Leader>o :BufOnly<CR>
-" nnoremap <Leader>bq :bp<bar>sp<bar>bn<bar>bd<CR>
 nnoremap <silent> <Leader>d :bp<bar>sp<bar>bn<bar>bd<CR>
-nnoremap gb <C-^>
 nnoremap <silent> <Leader>l :bnext<CR>
 nnoremap <silent> <Leader>h :bprevious<CR>
 nnoremap <silent> <Leader>b :bn<CR>
 nnoremap <silent> <Leader>B :bp<CR>
+nnoremap gb <C-^>
 " nnoremap <Leader>ba :%bdelete<CR>
 for s:i in range(1, 9)
 execute 'nnoremap ' . s:i . 'gb :b' . s:i . '<CR>'
