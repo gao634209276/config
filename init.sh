@@ -1,4 +1,3 @@
-export OWNER=gaoyajun02
 cwd=$(dirname "${BASH_SOURCE-$0}")
 cwd=$(cd "${cwd}"; pwd)
 
@@ -15,13 +14,13 @@ update_conf() {
     echo "ln $target $link"
 }
 # update my bashrc
-update_conf $cwd/bashrc $HOME/$OWNER/.bashrc
+update_conf $cwd/bashrc $HOME/$OWNER/.zshrc_dev
 # update my nvim
 for f in "init.vim" "base-settings.vim" "plug-settings.vim" "coc-settings.json" ; do
-    update_conf $cwd/nvim/$f $HOME/$OWNER/.config/nvim/$f
+    update_conf $cwd/nvim/$f $HOME/.config/nvim/$f
 done
 # update my tmux
 mkdir -p $HOME/$OWNER/.tmux
-update_conf $cwd/tmux/tmux.conf $HOME/$OWNER/.tmux.conf
-update_conf $cwd/tmux/tmuxline.conf $HOME/$OWNER/.tmuxline.conf
-update_conf $cwd/tmux/tmux_layout $HOME/$OWNER/.tmux/tmux_layout
+update_conf $cwd/tmux/tmux.conf $HOME/.tmux.conf
+update_conf $cwd/tmux/tmuxline.conf $HOME/.muxline.conf
+update_conf $cwd/tmux/tmux_layout $HOME/.tmux/tmux_layout

@@ -1,11 +1,4 @@
 " plug settings
-" === Vim-solarized8
-if has('nvim') && has_key(g:plugs, 'vim-solarized8')
-    colorscheme solarized8_flat
-endif
-let g:solarized_use16 = 1
-let g:solarized_old_cursor_style = 1
-
 " === Airline
 " let g:airline_extensions = []
 let g:airline#extensions#tabline#enabled = 1
@@ -86,10 +79,17 @@ function! LightlineReadonly()
   endif
 endfunction
 
-function! Lightlinegit()
-  let l:branch = fugitive#head()
-  return winwidth(0) > 70 ? (l:branch !=# '' ?  'ᚠ ' . l:branch : '') : ''
-endfunction
+if has('nvim') && has_key(g:plugs, 'coc-nvim')
+    function! Lightlinegit()
+      let l:branch = get(g:,'coc_git_status','')
+      return winwidth(0) > 70 ? l:branch : ''
+    endfunction
+else
+    function! Lightlinegit()
+      let l:branch = fugitive#head()
+      return winwidth(0) > 70 ? (l:branch !=# '' ?  'ᚠ ' . l:branch : '') : ''
+    endfunction
+endif
 
 " Dianostic, coc need
 function! LightlineDiagnostic() abort
@@ -127,9 +127,6 @@ let g:lightline.component_type     = {'buffers': 'tabsel', 'close': 'raw'}
 
 " === NERDTree
 nnoremap tt :NERDTreeToggle<CR>
-nnoremap tu :UndotreeToggle<CR>
-nnoremap <F2> :NERDTreeToggle<CR>
-nnoremap <F5> :UndotreeToggle<CR>
 
 let g:NERDTreeWinSize=35
 let g:NERDTreeShowBookmarks = 1
@@ -175,15 +172,27 @@ let g:bookmark_no_default_key_mappings = 1
 " let g:bookmark_location_list = 1
 
 " === Git
-" nnoremap <Leader>gd :Gdiffsplit!<CR>
+" === vim-fugitive
 nnoremap <Leader>gd :Gvdiffsplit!<CR>
+" nnoremap <Leader>gl :GLog!<CR>
+" nnoremap <Leader>gL :GlLog!<CR>
 let g:fugitive_no_maps = 1
-
 
 " === Fzf
 let g:fzf_preview_window = 'right:60%'
-let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.8 } }
+let g:fzf_layout = { 'window': {'width': 0.9, 'height': 0.8 } }
+" let g:fzf_layout = { 'window': 'enew' }
+let g:fzf_buffers_jump = 1
+let g:fzf_commits_log_options = '--color --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
 " let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
+let g:fzf_tags_command = 'ctags -R'
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>), 1,
+  \   fzf#vim#with_preview(), <bang>0)
+command! -bang Commits call fzf#vim#commits({'options': '--no-preview'}, <bang>0)
+
 " Files (runs $FZF_DEFAULT_COMMAND if defined)
 nnoremap <C-p> :Files<CR>
 nnoremap <Leader>ff :Files<CR>
@@ -192,9 +201,9 @@ nnoremap <Leader>fb :Buffers<CR>
 " v:oldfiles and open buffers
 nnoremap <Leader>fh :History<CR>
 " Lines in loaded buffers
-nnoremap <Leader>fL :Lines<CR>
+nnoremap <Leader>fl :Lines<CR>
 " Lines in the current buffer
-nnoremap <Leader>fl :BLines<CR>
+nnoremap <Leader>/ :BLines<CR>
 " Tags in the current buffer
 nnoremap <Leader>fT :Tags<CR>
 " Tags in the project (ctags -R)
@@ -207,11 +216,15 @@ nnoremap <Leader>f: :History:<CR>
 nnoremap <Leader>f/ :History/<CR>
 " :Commands
 nnoremap <Leader>fc :Commands<CR>
-nnoremap <Leader>c :Colors<CR>
-" find normal map key
+" Normal mode mappings
 nnoremap <Leader>fk :Maps<CR>
+" Color schemes
+nnoremap <Leader>c :Colors<CR>
+" rg search result (ALT-A to select all, ALT-D to deselect all)
+nnoremap <Leader>rg :Rg<CR>
+
 " Git files (git ls-files)
-nnoremap <Leader>fg :GFiles<CR>
+nnoremap <Leader>gf :GFiles<CR>
 " Git commits (requires fugitive.vim)
 nnoremap <Leader>gc :Commits<CR>
 " Git commits for the current buffer
@@ -219,13 +232,23 @@ nnoremap <Leader>gb :BCommits<CR>
 " Git files (git status)
 nnoremap <Leader>gs :GFiles?<CR>
 
-" === Tmux
+" === Tmuxline
 let g:tmuxline_powerline_separators = 0
 let g:tmuxline_theme = 'lightline'
+let g:tmuxline_preset = {
+      \'a'    : '#S',
+      \'b'    : '#I',
+      \'c'    : '#W',
+      \'win'  : ['#I #W'],
+      \'cwin' : ['#I #W'],
+      \'x'    : '%Y-%m-%d %H:%M:%S',
+      \'y'    : '#(whoami)',
+      \'z'    : '#h'
+      \ }
 " :Tmuxline lightline
 " :TmuxlineSnapshot tmuxline.conf
 
-if !has('nvim')
+if !has('nvim') || version < 800
     finish
 endif
 
@@ -236,7 +259,7 @@ set hidden
 set nobackup
 set nowritebackup
 " Smaller updatetime for CursorHold & CursorHoldI
-set updatetime=300
+set updatetime=100
 " Don't pass messages to |ins-completion-menu|.
 set shortmess+=c
 " always show signcolumns
@@ -252,9 +275,9 @@ if exists(':tnoremap')
 endif
 
 set pyxversion=2
-let g:coc_node_path = '/opt/meituan/node/bin/node'
-let g:python_host_prog  = '/opt/meituan/miniconda2/envs/python2.7/bin/python'
-let g:python3_host_prog = '/opt/meituan/miniconda2/envs/python3/bin/python'
+let g:coc_node_path = '/usr/local/opt/node@10/bin/node'
+let g:python_host_prog  = '/opt/miniconda3/envs/py2.7/bin/python'
+let g:python3_host_prog = '/opt/miniconda3/envs/py3.8/bin/python'
 let g:python_host_skip_check = 1
 let g:python3_host_skip_check = 1
 " let g:loaded_python3_provider = 0
@@ -264,7 +287,8 @@ let g:loaded_ruby_provider = 0
 silent! au BufEnter,BufRead,BufNewFile * silent! unmap if
 autocmd FileType json syntax match Comment +\/\/.\+$+
             " \ 'coc-prettier',
-            " "\ 'coc-fzf-preview',
+            " \ 'coc-fzf-preview',
+            " \ 'coc-java',
 let g:coc_global_extensions = [
             \ 'coc-css',
             \ 'coc-diagnostic',
@@ -276,13 +300,15 @@ let g:coc_global_extensions = [
             \ 'coc-highlight',
             \ 'coc-json',
             \ 'coc-pairs',
-            \ 'coc-python',
+            \ 'coc-prettier',
+            \ 'coc-python@1.2.12',
             \ 'coc-sh',
             \ 'coc-sql',
             \ 'coc-snippets',
             \ 'coc-syntax',
             \ 'coc-todolist',
             \ 'coc-tsserver',
+            \ 'coc-clangd',
             \ 'coc-vimlsp',
             \ 'coc-yaml',
             \ 'coc-yank']
@@ -331,7 +357,6 @@ nmap <silent> [d <Plug>(coc-diagnostic-prev)
 nmap <silent> ]d <Plug>(coc-diagnostic-next)
 
 " Highlight the symbol and its references when holding the cursor.
-" autocmd CursorHold * silent call CocActionAsync('highlight')
 if exists('*CocActionAsync')
     autocmd CursorHold * silent call CocActionAsync('highlight')
 endif
@@ -413,13 +438,8 @@ omap ac <Plug>(coc-classobj-a)
 " nmap <silent> <C-s> <Plug>(coc-range-select)
 " xmap <silent> <C-s> <Plug>(coc-range-select)
 
-" Add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call CocAction('fold', <f-args>)
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR   :call CocAction('runCommand', 'editor.action.organizeImport')
-" Add `:Tsc` command for debug. see: https://github.com/neoclide/coc.nvim/wiki/Debug-coc.nvim
-" command! -nargs=0 Tsc :call CocAction('runCommand', 'tsserver.watchBuild')
-
 
 " add C for CocConfig
 function! SetupCommandAbbrs(from, to)
@@ -431,21 +451,6 @@ endfunction
 " Use C to open coc config
 call SetupCommandAbbrs('C', 'CocConfig')
 
-" Mappings for CoCList
-" Manage extensions.
-nnoremap <silent><nowait> \e  :<C-u>CocList extensions<cr>
-" Show commands.
-nnoremap <silent><nowait> \c  :<C-u>CocList commands<cr>
-" Find symbol of current document.
-nnoremap <silent><nowait> \o  :<C-u>CocList outline<cr>
-" Search workspace symbols. need Ctags
-nnoremap <silent><nowait> \s  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent><nowait> ]c  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent><nowait> [c  :<C-u>CocPrev<CR>
-" Resume latest coc list.
-nnoremap <silent><nowait> \l  :<C-u>CocListResume<CR>
 
 " coc-fzf
 " let g:coc_fzf_preview = ''
@@ -456,12 +461,11 @@ let g:coc_fzf_opts = ['--layout=reverse']
 nnoremap <silent> <Leader>fD :<C-u>CocFzfList diagnostics<CR>
 nnoremap <silent> <Leader>fd :<C-u>CocFzfList diagnostics --current-buf<CR>
 nnoremap <silent> <Leader>fy :<C-u>CocFzfList yank<CR>
-nnoremap <silent> <Leader>fc :<C-u>CocFzfList location<CR>
+nnoremap <silent> <Leader>fa :<C-u>CocFzfList location<CR>
 nnoremap <silent> <Leader>fs :<C-u>CocFzfList symbols<CR>
 " Preview not Support
 nnoremap <silent> <Leader>fF :<C-u>CocFzfList<CR>
-" nnoremap <silent> <Leader>fo :<C-u>CocFzfList outline<CR>
-" nnoremap <silent> <Leader>fR :<C-u>CocFzfListResume<CR>
+nnoremap <silent> <Leader>fo :<C-u>CocFzfList outline<CR>
 
 " coc-vista
 let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]

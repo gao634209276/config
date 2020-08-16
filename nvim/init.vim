@@ -1,27 +1,4 @@
-" === Support multi-user custom settings, and the settings is user-isolated
-let $OWNER = empty($OWNER) ? 'sankuai' : $OWNER
-let $HOME = '/home/sankuai'
-if exists('$OWNER') && $OWNER != 'sankuai' && filereadable(expand('~/$OWNER/.config/nvim/init.vim'))
-    " Reset Vim-Plug path for user
-    let g:vim_home = '~/$OWNER/.config/nvim'
-    if has('nvim')
-        let &packpath = &runtimepath
-        " Reset Coc path for user
-        let g:coc_config_home = '~/$OWNER/.config/nvim'
-        let g:coc_data_home = '~/$OWNER/.config/coc'
-    endif
-    " Source User init.vim if current script file is not
-    if fnamemodify(expand('<sfile>'), ':p:~') !~ expand('$OWNER').'/.config/nvim/init.vim$'
-        exec 'source' g:vim_home.'/init.vim'
-        finish
-    endif
-    " Reset runtimepath for user
-    set runtimepath-=~/.config/nvim
-    set runtimepath-=~/.config/nvim/after
-    set runtimepath^=~/$OWNER/.config/nvim
-    set runtimepath+=~/$OWNER/.config/nvim/after
-endif
-
+let g:vim_home = '~/.config/nvim'
 " === Install Plugins with Vim-Plug
 " Default Plug Path
 let g:vim_home = exists('g:vim_home') ? g:vim_home : '~/.config/nvim'
@@ -59,7 +36,6 @@ Plug 'vim-scripts/bufonly.vim'
 " Git
 Plug 'tpope/vim-fugitive'
 " Plug 'junegunn/gv.vim'
-" Plug 'airblade/vim-gitgutter'
 
 " Plug 'jiangmiao/auto-pairs'
 " Plug 'itchyny/vim-cursorword'
@@ -73,11 +49,11 @@ if exists('$TMUX')
     Plug 'edkolev/tmuxline.vim'
     Plug 'christoomey/vim-tmux-navigator'
 endif
-if has('nvim')
+if has('nvim') || version >= 800
     " auto complete
     " Plug 'Shougo/denite.nvim', { 'do': ':updateremoteplugins' }
     " Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release', 'do': ':UpdateRemotePlugins' }
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install()}}
     Plug 'antoinemadec/coc-fzf'
     Plug 'liuchengxu/vista.vim'
 endif

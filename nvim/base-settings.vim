@@ -2,40 +2,34 @@
 " === System
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " === Moure, Clipboard
-set mouse=a
+" set mouse=a
 " set mouse-=a
+set mouse=n
 " set mouse=nicr
 " Use the OS clipboard by default (on versions compiled with `+clipboard`)
 set clipboard^=unnamed,unnamedplus
 " Clipboard Provider pb/tmux/osc52/local copy, and pb/tmux/local for paste
-" Tmux support osc52, and Tmux tty not need user permissions for copy remote to local
-let $COPY_PROVIDERS  = empty($TMUX) ? 'local' : 'tmux osc52'
-let $PASTE_PROVIDERS = empty($TMUX) ? 'local' : 'tmux'
-let g:clipboard = {
-  \ 'name': 'myClipboard',
-  \     'copy': {
-  \         '+': 'clipboard-provider copy',
-  \         '*': 'clipboard-provider copy',
-  \     },
-  \     'paste': {
-  \         '+': 'clipboard-provider paste',
-  \         '*': 'clipboard-provider paste',
-  \     },
-  \ }
 " === Colors and Fonts
-" set t_Co=256
-" set t_Co=16
+set t_Co=16
 if has("termguicolors")
     " Fix bug for vim
-    set t_8f=^[[38;2;%lu;%lu;%lum
-    set t_8b=^[[48;2;%lu;%lu;%lum
+    " set t_8f=^[[38;2;%lu;%lu;%lum
+    " set t_8b=^[[48;2;%lu;%lu;%lum
     " Enable true color
     set termguicolors
 endif
 set background=dark
 try
-    " Plug vim-colors-solarized needed
-    colorscheme solarized
+    " For Lightline
+    if has_key(g:plugs, 'vim-colors-solarized')
+        colorscheme solarized
+    endif
+    " Plug 'lifepillar/vim-solarized8' needed
+    if has_key(g:plugs, 'vim-solarized8')
+        colorscheme solarized8_flat
+        let g:solarized_use16 = 1
+        let g:solarized_old_cursor_style = 1
+    endif
 catch
 endtry
 
@@ -48,7 +42,7 @@ set scrolloff=5
 " set langmenu=en_US.UTF-8
 set langmenu=zh_CN.UTF-8
 language messages zh_CN.UTF-8
-language time zh_CN.UTF-8
+language time en_US.UTF-8
 
 " === Files, backups and undo
 set nobackup
@@ -61,9 +55,10 @@ if has('persistent_undo')
 endif
 set viminfo='10,\"100,:20,%
 if has('nvim')
-    set viminfo+=n~/.local/share/nvim/shada/$OWNER.shada
+    set viminfo+=n~/.local/share/nvim/shada/main.shada
 else
-    set viminfo+=n~/.viminfo
+    silent !mkdir -p ~/.local/share/vim
+    set viminfo+=n~/.local/share/vim/viminfo
 endif
 " Set to auto read when a file is changed from the outside
 set autoread
@@ -99,7 +94,6 @@ set smartcase
 " Main code display
 set number norelativenumber
 set cursorline
-set ambiwidth=double
 " Indent behavior
 set expandtab
 set shiftwidth=4 tabstop=4 softtabstop=4
@@ -154,10 +148,9 @@ nnoremap <silent> <Leader><CR> :nohlsearch<CR>
 nnoremap s/ :<C-u>%s//g<Left><Left>
 nnoremap <expr> s* ':<C-u>%s/\<' . expand('<cword>') . '\>//g<Left><Left>'
 nnoremap <expr> sg ':<C-u>%s/' . expand('<cword>') . '//g<Left><Left>'
-nnoremap ss :<C-u>silent keeppatterns %substitute/\s\+$//e<CR>
+nnoremap s<Space> :<C-u>silent keeppatterns %substitute/\s\+$//e<CR>
 " remove the windows ^M - when the encodings gets messed up
 nnoremap sm mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
-" nnoremap <leader>g :execute "grep -R " . shellescape("<cWORD>") . " ."<cr>
 
 " map si :set splitright<CR>:vsplit<CR>
 " map sn :set nosplitright<CR>:vsplit<CR>
@@ -165,16 +158,20 @@ nnoremap sm mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
 " map se :set splitbelow<CR>:split<CR>
 
 " Toggle fold
-nnoremap <CR> za
-nnoremap <Leader>, zc<CR>
-nnoremap <Leader>. zo<CR>
 " Focus the current fold by closing all others
 nnoremap <Leader>z zMzvzz
 
-" Cursor Movement
+" === Cursor Movement
 " Easier line-wise movement
-nnoremap gh g^
-nnoremap gl g$
+noremap H g^
+noremap L g$
+
+" Location/quickfix list movement
+nnoremap ]l :lnext<CR>
+nnoremap [l :lprev<CR>
+nnoremap ]c :cnext<CR>
+nnoremap [c :cprev<CR>
+
 vnoremap j gj
 vnoremap k gk
 cnoremap <C-h> <Left>
@@ -200,17 +197,15 @@ nnoremap Y y$
 nnoremap yp :let @+=expand("%:~:.")<CR>:echo 'Yanked relative path'<CR>
 nnoremap yP :let @+=expand("%:p")<CR>:echo 'Yanked absolute path'<CR>
 " toggle paste mode on and off
-" nnoremap <Leader>p :setlocal paste!<CR>
 nnoremap <Leader>y :registers<CR>
 
 " Buffer
 " nnoremap <Leader>ba :bufdo bd<CR>
 nnoremap <Leader>o :BufOnly<CR>
+nnoremap <silent> <Leader>e :enew<CR>
 nnoremap <silent> <Leader>d :bp<bar>sp<bar>bn<bar>bd<CR>
 nnoremap <silent> <Leader>l :bnext<CR>
 nnoremap <silent> <Leader>h :bprevious<CR>
-nnoremap <silent> <Leader>b :bn<CR>
-nnoremap <silent> <Leader>B :bp<CR>
 nnoremap gb <C-^>
 " nnoremap <Leader>ba :%bdelete<CR>
 for s:i in range(1, 9)
@@ -220,8 +215,11 @@ endfor
 map <Leader>cd :cd %:p:h<CR>:pwd<CR>
 
 " Window
-nnoremap <leader>s <C-w>v<C-w>l
-nnoremap <leader>i <C-w>s
+nnoremap sv <C-w>v<C-w>l
+nnoremap ss <C-w>s
+nnoremap s- <C-w>-
+nnoremap s\| <C-w>\|
+nnoremap s= <C-w>=
 nmap <C-j> <C-w>j
 nmap <C-h> <C-w>h
 nmap <C-l> <C-w>l
@@ -256,4 +254,3 @@ function! HideNumber()
 endfunc
 nnoremap <F3> :call HideNumber()<CR>
 nnoremap <Leader>n :call HideNumber()<CR>
-
