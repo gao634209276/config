@@ -43,8 +43,10 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround' " type yskw' to wrap the word with '' or type cs'` to change 'word' to `word`
 
 " Plug 'derekwyatt/vim-scala'
+Plug 'skywind3000/asyncrun.vim'
 
 " Tmux
+Plug 'preservim/vimux'
 if exists('$TMUX')
     Plug 'edkolev/tmuxline.vim'
     Plug 'christoomey/vim-tmux-navigator'

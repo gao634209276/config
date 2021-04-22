@@ -251,6 +251,37 @@ let g:tmuxline_preset = {
 if !has('nvim') || version < 800
     finish
 endif
+" === ansycrun
+let g:asyncrun_open = 6
+let g:asyncrun_bell = 1
+nnoremap tq :call asyncrun#quickfix_toggle(6)<cr>
+" nnoremap <silent> <F5> :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+" nnoremap <silent> <F9> :AsyncRun -raw -cwd=$(VIM_FILEDIR) g++ -Wall -O2 $(VIM_FILEPATH) -o $(VIM_FILEDIR)/$(VIM_FILENOEXT) <cr>
+" nnoremap <silent> <F5> :AsyncRun -mode=term -pos=test ls -la $(VIM_FILEDIR)
+" nnoremap <silent> <F5> :AsyncRun -raw -cwd=$(VIM_FILEDIR) $(VIM_FILEDIR)/$(VIM_FILENOEXT)
+nnoremap <silent> <F9> :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) g++ -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+nnoremap <silent> <F5> :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) $(VIM_FILEDIR)/$(VIM_FILENOEXT) <cr>
+
+" https://blog.csdn.net/qq_41719883/article/details/110355482
+map <F5> :call Runcode()<CR>
+func! Runcode()
+    exec "w"
+    if &filetype == 'python'
+        if search("@profile")
+            exec "AsyncRun kernprof -l -v %"
+        elseif search("set_trace()")
+           exec "!python3 %"
+        else
+            :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) python $(VIM_FILENAME)
+        endif
+    elseif &filetype == 'c'
+        :AsyncRun! gcc % -o %<; time ./%<
+    elseif &filetype == 'cpp'
+        AsyncRun! -mode=term -rows=10 g++ -std=c++11 -Wall -O2 $(VIM_FILEPATH) -o $(VIM_FILEDIR)/$(VIM_FILENOEXT); time ./$(VIM_FILENOEXT)
+    elseif &filetype == 'java'
+        AsyncRun! javac $(VIM_FILENAME); time java $(VIM_FILENOEXT)
+    endif
+endfunc
 
 " === Nvim
 set completeopt=longest,noinsert,menuone,noselect,preview
