@@ -37,7 +37,7 @@ Plug 'vim-scripts/bufonly.vim'
 Plug 'tpope/vim-fugitive'
 " Plug 'junegunn/gv.vim'
 
-" Plug 'jiangmiao/auto-pairs'
+Plug 'jiangmiao/auto-pairs'
 " Plug 'itchyny/vim-cursorword'
 " Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround' " type yskw' to wrap the word with '' or type cs'` to change 'word' to `word`

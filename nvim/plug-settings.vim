@@ -320,6 +320,7 @@ autocmd FileType json syntax match Comment +\/\/.\+$+
             " \ 'coc-prettier',
             " \ 'coc-fzf-preview',
             " \ 'coc-java',
+            " \ 'coc-pairs',
 let g:coc_global_extensions = [
             \ 'coc-css',
             \ 'coc-diagnostic',
@@ -330,7 +331,6 @@ let g:coc_global_extensions = [
             \ 'coc-html',
             \ 'coc-highlight',
             \ 'coc-json',
-            \ 'coc-pairs',
             \ 'coc-prettier',
             \ 'coc-python@1.2.12',
             \ 'coc-sh',

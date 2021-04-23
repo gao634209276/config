@@ -97,6 +97,7 @@ set cursorline
 " Indent behavior
 set expandtab
 set shiftwidth=4 tabstop=4 softtabstop=4
+autocmd FileType cpp setlocal et sta sw=2 ts=2 sts=2
 " Prevent auto line split
 set textwidth=120
 set indentexpr= autoindent smartindent
