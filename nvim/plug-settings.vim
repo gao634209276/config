@@ -177,8 +177,10 @@ nnoremap <Leader>gd :Gvdiffsplit!<CR>
 " nnoremap <Leader>gl :GLog!<CR>
 " nnoremap <Leader>gL :GlLog!<CR>
 let g:fugitive_no_maps = 1
+" === auto-pairs
+let g:AutoPairsMapCh = 0
 
-" === Fzf
+"=== Fzf
 let g:fzf_preview_window = 'right:60%'
 let g:fzf_layout = { 'window': {'width': 0.9, 'height': 0.8 } }
 " let g:fzf_layout = { 'window': 'enew' }
@@ -259,7 +261,7 @@ nnoremap tq :call asyncrun#quickfix_toggle(6)<cr>
 " nnoremap <silent> <F9> :AsyncRun -raw -cwd=$(VIM_FILEDIR) g++ -Wall -O2 $(VIM_FILEPATH) -o $(VIM_FILEDIR)/$(VIM_FILENOEXT) <cr>
 " nnoremap <silent> <F5> :AsyncRun -mode=term -pos=test ls -la $(VIM_FILEDIR)
 " nnoremap <silent> <F5> :AsyncRun -raw -cwd=$(VIM_FILEDIR) $(VIM_FILEDIR)/$(VIM_FILENOEXT)
-nnoremap <silent> <F9> :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) g++ -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+nnoremap <silent> <F9> :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) g++ -g -Wall -std=c++11 -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
 nnoremap <silent> <F5> :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) $(VIM_FILEDIR)/$(VIM_FILENOEXT) <cr>
 
 " https://blog.csdn.net/qq_41719883/article/details/110355482
@@ -277,7 +279,9 @@ func! Runcode()
     elseif &filetype == 'c'
         :AsyncRun! gcc % -o %<; time ./%<
     elseif &filetype == 'cpp'
-        AsyncRun! -mode=term -rows=10 g++ -std=c++11 -Wall -O2 $(VIM_FILEPATH) -o $(VIM_FILEDIR)/$(VIM_FILENOEXT); time ./$(VIM_FILENOEXT)
+        AsyncRun! -mode=term -rows=10 mkdir -pv $(VIM_FILEDIR)/build;
+                    \ g++ -std=c++11 -Wall -O2 $(VIM_FILEPATH) -o $(VIM_FILEDIR)/build/$(VIM_FILENOEXT);
+                    \ time ./build/$(VIM_FILENOEXT)
     elseif &filetype == 'java'
         AsyncRun! javac $(VIM_FILENAME); time java $(VIM_FILENOEXT)
     endif

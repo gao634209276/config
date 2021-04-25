@@ -8,7 +8,7 @@
     ".svn"
   ],
   // "coc.preferences.hoverTarget": "preview",
-  "coc.preferences.hoverTarget": "float",
+  // "coc.preferences.hoverTarget": "float",
   "coc.preferences.enableFloatHighlight": true,
   "coc.preferences.currentFunctionSymbolAutoUpdate": true,
   "coc.preferences.colorSupport": true,
@@ -24,7 +24,8 @@
     "javascript",
     "typescript"
   ],
-  "suggest.autoTrigger": "trigger",
+  // "suggest.autoTrigger": "trigger",
+  "suggest.autoTrigger": "always",
   "suggest.detailMaxLength": 60,
   "suggest.detailField": "preview",
   "suggest.enablePreview": true,
@@ -37,7 +38,7 @@
   "highlight.document.enable": true,
   "codeLens.enable": false,
   "diagnostic.enable": true,
-  "diagnostic.signOffset": 1,
+  // "diagnostic.signOffset": 1,
   //"diagnostic.errorSign": "×",
   //"diagnostic.warningSign": "!",
   "diagnostic.errorSign": "",
