@@ -2,9 +2,9 @@
 " === System
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " === Moure, Clipboard
-" set mouse=a
+set mouse=a
 " set mouse-=a
-set mouse=n
+" set mouse=n
 " set mouse=nicr
 " Use the OS clipboard by default (on versions compiled with `+clipboard`)
 set clipboard^=unnamed,unnamedplus
@@ -97,6 +97,7 @@ set cursorline
 " Indent behavior
 set expandtab
 set shiftwidth=4 tabstop=4 softtabstop=4
+autocmd FileType cpp setlocal et sta sw=2 ts=2 sts=2
 " Prevent auto line split
 set textwidth=120
 set indentexpr= autoindent smartindent
@@ -163,8 +164,8 @@ nnoremap <Leader>z zMzvzz
 
 " === Cursor Movement
 " Easier line-wise movement
-nnoremap gh g^
-nnoremap gl g$
+noremap H g^
+noremap L g$
 
 " Location/quickfix list movement
 nnoremap ]l :lnext<CR>

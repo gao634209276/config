@@ -1,3 +1,5 @@
+# Path
+export PATH=/opt/node/bin:$PATH
 # For tmux
 alias tl='tmux ls'
 alias ta='tmux attach-session -t'

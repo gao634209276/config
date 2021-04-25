@@ -22,5 +22,9 @@ done
 # update my tmux
 mkdir -p $HOME/$OWNER/.tmux
 update_conf $cwd/tmux/tmux.conf $HOME/.tmux.conf
-update_conf $cwd/tmux/tmuxline.conf $HOME/.muxline.conf
+update_conf $cwd/tmux/tmuxline.conf $HOME/.tmuxline.conf
 update_conf $cwd/tmux/tmux_layout $HOME/.tmux/tmux_layout
+
+# init vim
+source ~/.zshrc
+nvim +PlugUpgrade +PlugInstall +PlugUpdate +CocUpdate +qa

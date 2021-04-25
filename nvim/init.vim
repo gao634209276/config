@@ -14,9 +14,9 @@ call plug#begin(g:vim_plugged_path)
 " Plug 'yianwillis/vimcdoc'
 Plug 'altercation/vim-colors-solarized'
 Plug 'lifepillar/vim-solarized8'
-" Plug 'vim-scripts/molokai'
-" Plug 'sickill/vim-monokai'
-" Plug 'tomasiser/vim-code-dark'
+Plug 'vim-scripts/molokai'
+Plug 'sickill/vim-monokai'
+Plug 'tomasiser/vim-code-dark'
 " Status line
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
@@ -37,23 +37,26 @@ Plug 'vim-scripts/bufonly.vim'
 Plug 'tpope/vim-fugitive'
 " Plug 'junegunn/gv.vim'
 
-" Plug 'jiangmiao/auto-pairs'
+Plug 'jiangmiao/auto-pairs'
 " Plug 'itchyny/vim-cursorword'
 " Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround' " type yskw' to wrap the word with '' or type cs'` to change 'word' to `word`
 
 " Plug 'derekwyatt/vim-scala'
+Plug 'skywind3000/asyncrun.vim'
+
 
 " Tmux
+Plug 'preservim/vimux'
 if exists('$TMUX')
     Plug 'edkolev/tmuxline.vim'
     Plug 'christoomey/vim-tmux-navigator'
 endif
-if has('nvim')
+if has('nvim') || version >= 800
     " auto complete
     " Plug 'Shougo/denite.nvim', { 'do': ':updateremoteplugins' }
     " Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release', 'do': ':UpdateRemotePlugins' }
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install()}}
     Plug 'antoinemadec/coc-fzf'
     Plug 'liuchengxu/vista.vim'
 endif

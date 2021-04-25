@@ -178,6 +178,9 @@ nnoremap <Leader>gd :Gvdiffsplit!<CR>
 " nnoremap <Leader>gL :GlLog!<CR>
 let g:fugitive_no_maps = 1
 
+" === auto-pairs
+let g:AutoPairsMapCh = 0
+
 " === Fzf
 let g:fzf_preview_window = 'right:60%'
 let g:fzf_layout = { 'window': {'width': 0.9, 'height': 0.8 } }
@@ -248,9 +251,42 @@ let g:tmuxline_preset = {
 " :Tmuxline lightline
 " :TmuxlineSnapshot tmuxline.conf
 
-if !has('nvim')
+" === ansycrun
+let g:asyncrun_open = 6
+let g:asyncrun_bell = 1
+nnoremap tq :call asyncrun#quickfix_toggle(6)<cr>
+" nnoremap <silent> <F5> :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+" nnoremap <silent> <F9> :AsyncRun -raw -cwd=$(VIM_FILEDIR) g++ -Wall -O2 $(VIM_FILEPATH) -o $(VIM_FILEDIR)/$(VIM_FILENOEXT) <cr>
+" nnoremap <silent> <F5> :AsyncRun -mode=term -pos=test ls -la $(VIM_FILEDIR)
+" nnoremap <silent> <F5> :AsyncRun -raw -cwd=$(VIM_FILEDIR) $(VIM_FILEDIR)/$(VIM_FILENOEXT)
+nnoremap <silent> <F9> :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) g++ -g -Wall -std=c++11 -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+nnoremap <silent> <F5> :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) $(VIM_FILEDIR)/$(VIM_FILENOEXT) <cr>
+
+if !has('nvim') || version < 800
     finish
 endif
+
+map <F5> :call Runcode()<CR>
+func! Runcode()
+    exec "w"
+    if &filetype == 'python'
+        if search("@profile")
+            exec "AsyncRun kernprof -l -v %"
+        elseif search("set_trace()")
+           exec "!python3 %"
+        else
+            :AsyncRun -mode=term -rows=10 -cwd=$(VIM_FILEDIR) python $(VIM_FILENAME)
+        endif
+    elseif &filetype == 'c'
+        :AsyncRun! gcc % -o %<; time ./%<
+    elseif &filetype == 'cpp'
+        AsyncRun! -mode=term -rows=10 mkdir -pv $(VIM_FILEDIR)/build;
+                    \ g++ -std=c++11 -Wall -O2 $(VIM_FILEPATH) -o $(VIM_FILEDIR)/build/$(VIM_FILENOEXT);
+                    \ time ./build/$(VIM_FILENOEXT)
+    elseif &filetype == 'java'
+        AsyncRun! javac $(VIM_FILENAME); time java $(VIM_FILENOEXT)
+    endif
+endfunc
 
 " === Nvim
 set completeopt=longest,noinsert,menuone,noselect,preview
@@ -275,7 +311,7 @@ if exists(':tnoremap')
 endif
 
 set pyxversion=2
-let g:coc_node_path = '/usr/local/opt/node@10/bin/node'
+let g:coc_node_path = '/opt/node/bin/node'
 let g:python_host_prog  = '/opt/miniconda2/envs/python2.7/bin/python'
 let g:python3_host_prog = '/opt/miniconda2/envs/python3/bin/python'
 let g:python_host_skip_check = 1
@@ -286,9 +322,8 @@ let g:loaded_ruby_provider = 0
 " === Coc
 silent! au BufEnter,BufRead,BufNewFile * silent! unmap if
 autocmd FileType json syntax match Comment +\/\/.\+$+
-            " \ 'coc-prettier',
-            " "\ 'coc-fzf-preview',
 let g:coc_global_extensions = [
+            \ 'coc-clangd',
             \ 'coc-css',
             \ 'coc-diagnostic',
             \ 'coc-explorer',
@@ -298,7 +333,6 @@ let g:coc_global_extensions = [
             \ 'coc-html',
             \ 'coc-highlight',
             \ 'coc-json',
-            \ 'coc-pairs',
             \ 'coc-prettier',
             \ 'coc-python',
             \ 'coc-sh',
