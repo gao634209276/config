@@ -12,34 +12,42 @@ endif
 
 call plug#begin(g:vim_plugged_path)
 " Plug 'yianwillis/vimcdoc'
+
+" File navigation
+Plug 'preservim/nerdtree', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
+" Plug 'Xuyuanp/nerdtree-git-plugin', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
+" Plug 'phongvcao/nerdtree-yank-plugin', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
+Plug 'mbbill/undotree'
+Plug 'vim-scripts/bufonly.vim'
+
+"" Basic plugin
+Plug 'mhinz/vim-startify'
 Plug 'altercation/vim-colors-solarized'
 Plug 'lifepillar/vim-solarized8'
 " Plug 'vim-scripts/molokai'
 " Plug 'sickill/vim-monokai'
 " Plug 'tomasiser/vim-code-dark'
+
+" BookMarks
+" Plug 'MattesGroeger/vim-bookmarks'
+Plug 'kshenoy/vim-signature'
+
 " Status line
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 " Plug 'vim-airline/vim-airline'
 " Plug 'vim-airline/vim-airline-themes'
 
-" File navigation
-Plug 'preservim/nerdtree', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
-" Plug 'Xuyuanp/nerdtree-git-plugin', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
-" Plug 'phongvcao/nerdtree-yank-plugin', { 'on' : [ 'NERDTreeToggle', 'NERDTreeClose', 'NERDTree' ] }
-Plug 'junegunn/fzf', {'dir': '~/.fzf','do': './install --all'}
-Plug 'junegunn/fzf.vim' " needed for previews
-" Plug 'MattesGroeger/vim-bookmarks'
-
-Plug 'mbbill/undotree'
-Plug 'vim-scripts/bufonly.vim'
 " Git
 Plug 'tpope/vim-fugitive'
 " Plug 'junegunn/gv.vim'
 
+Plug 'junegunn/fzf', {'dir': '~/.fzf','do': './install --all'}
+Plug 'junegunn/fzf.vim' " needed for previews
+
 Plug 'jiangmiao/auto-pairs'
 " Plug 'itchyny/vim-cursorword'
-" Plug 'easymotion/vim-easymotion'
+Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround' " type yskw' to wrap the word with '' or type cs'` to change 'word' to `word`
 
 " Plug 'derekwyatt/vim-scala'

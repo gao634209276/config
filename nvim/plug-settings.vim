@@ -289,16 +289,27 @@ endfunc
 
 " === Nvim
 set completeopt=longest,noinsert,menuone,noselect,preview
-" fix the most annoying bug that coc has
+set encoding=utf-8
+" TextEdit might fail if hidden is not set.
 set hidden
+" Some servers have issues with backup files, see #649.
 set nobackup
 set nowritebackup
-" Smaller updatetime for CursorHold & CursorHoldI
-set updatetime=100
+" Give more space for displaying messages.
+set cmdheight=2
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
 " Don't pass messages to |ins-completion-menu|.
 set shortmess+=c
-" always show signcolumns
-set signcolumn=yes
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+if has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
 " === Terminal Mode
 let g:neoterm_autoscroll = 1
 autocmd TermOpen term://* startinsert
@@ -310,7 +321,7 @@ if exists(':tnoremap')
 endif
 
 set pyxversion=2
-let g:coc_node_path = '/usr/local/opt/node@10/bin/node'
+let g:coc_node_path = '/usr/local/opt/node@12/bin/node'
 let g:python_host_prog  = '/opt/miniconda3/envs/py2.7/bin/python'
 let g:python3_host_prog = '/opt/miniconda3/envs/py3.8/bin/python'
 let g:python_host_skip_check = 1
@@ -325,8 +336,11 @@ autocmd FileType json syntax match Comment +\/\/.\+$+
             " \ 'coc-fzf-preview',
             " \ 'coc-java',
             " \ 'coc-pairs',
+            " \ 'coc-python',
+            " \ 'coc-snippets',
+            " \ 'coc-prettier',
+            " \ 'coc-ultisnips',
 let g:coc_global_extensions = [
-            \ 'coc-css',
             \ 'coc-diagnostic',
             \ 'coc-explorer',
             \ 'coc-flutter-tools',
@@ -336,8 +350,7 @@ let g:coc_global_extensions = [
             \ 'coc-highlight',
             \ 'coc-json',
             \ 'coc-prettier',
-            \ 'coc-python@1.2.12',
-            \ 'coc-sh',
+            \ 'coc-python',
             \ 'coc-sql',
             \ 'coc-snippets',
             \ 'coc-syntax',
@@ -360,22 +373,30 @@ function! s:check_back_space() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~ '\s'
 endfunction
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
-" position. Coc only does snippet and additional edit on confirm.
-" <cr> could be remapped by other vim plugin, try `:verbose imap <CR>`.
-if exists('*complete_info')
-  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-else
-  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-endif
-" close the preview window when completion is done.
-autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+" Make <CR> auto-select the first completion item and notify coc.nvim to
+" format on enter, <cr> could be remapped by other vim plugin
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" === Diagnostics quickfix
+" Use `[d` and `]d` to navigate diagnostics
+" Use `\d` get all diagnostics of current buffer in location list.
+nmap <silent> [d <Plug>(coc-diagnostic-prev)
+nmap <silent> ]d <Plug>(coc-diagnostic-next)
+nnoremap <silent><nowait> \d :<C-u>CocList diagnostics<cr>
+
+" === GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 " === Help/Document Trigger
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 " function args doc
 nnoremap <silent> <Leader>k :call CocActionAsync('showSignatureHelp')<CR>
+
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
@@ -384,34 +405,98 @@ function! s:show_documentation()
   endif
 endfunction
 
-" === Diagnostics quickfix
-" Use `\d` get all diagnostics of current buffer in location list.
-nnoremap <silent><nowait> \d :<C-u>CocList diagnostics<cr>
-" Use `[d` and `]d` to navigate diagnostics
-nmap <silent> [d <Plug>(coc-diagnostic-prev)
-nmap <silent> ]d <Plug>(coc-diagnostic-next)
-
+" === Symbol/References
 " Highlight the symbol and its references when holding the cursor.
-if exists('*CocActionAsync')
-    autocmd CursorHold * silent call CocActionAsync('highlight')
-endif
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-" Explore
-" nmap <leader>e :CocCommand explorer<CR>
-nmap te :CocCommand explorer<CR>
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Statusline
+" Symbol renaming.
+nmap <Leader>rn <Plug>(coc-rename)
+nmap <Leader>rf <Plug>(coc-refactor)
+
+" == Format code
+" Formatting selected code.
+xmap \f  <Plug>(coc-format-selected)
+nmap \f  <Plug>(coc-format-selected)
+nmap \ff  <Plug>(coc-format)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" === Coc action apply
+" Applying codeAction to the selected region.
+" Example: `<Leader>aap` for current paragraph
+xmap <Leader>a  <Plug>(coc-codeaction-selected)
+nmap <Leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying codeAction to the current buffer.
+nmap <Leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <Leader>af  <Plug>(coc-fix-current)
+
+" === Text objects
+" Map function and class text objects
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+
+" === Float windows/popups scroll
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+endif
+
+" Use CTRL-S for selections ranges.
+" Requires 'textDocument/selectionRange' support of LS, ex: coc-tsserver
+nmap <silent> <C-s> <Plug>(coc-range-select)
+xmap <silent> <C-s> <Plug>(coc-range-select)
+
+" === Some command
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call CocAction('runCommand', 'editor.action.organizeImport')
+" Add `:C` command for CocConfig
+function! SetupCommandAbbrs(from, to)
+  exec 'cnoreabbrev <expr> '.a:from
+        \ .' ((getcmdtype() ==# ":" && getcmdline() ==# "'.a:from.'")'
+        \ .'? ("'.a:to.'") : ("'.a:from.'"))'
+endfunction
+" Use C to open coc config
+call SetupCommandAbbrs('C', 'CocConfig')
+
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 function! CocCurrentFunction()
     return get(b:, 'coc_current_function', '')
 endfunction
 " let g:lightline.component_function.cocstatus = 'coc#status'
 let g:lightline.component_function.currentfunction = 'CocCurrentFunction'
 
-" Git
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" === Coc extension
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" === coc-explore
+" nmap <leader>e :coccommand explorer<cr>
+nmap te :CocCommand explorer<CR>
+
+" === coc-git
 " navigate chunks of current buffer
 nmap [g <Plug>(coc-git-prevchunk)
 nmap ]g <Plug>(coc-git-nextchunk)
@@ -426,68 +511,22 @@ omap ag <Plug>(coc-git-chunk-outer)
 xmap ag <Plug>(coc-git-chunk-outer)
 nnoremap <silent> \g  :<C-u>CocList --normal gstatus<CR>
 
-" Symbol renaming.
-nmap <Leader>rn <Plug>(coc-rename)
-nmap <Leader>rf <Plug>(coc-refactor)
+" === coc-snippets
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
 
-" === Format
-" Formatting selected code.
-xmap \f  <Plug>(coc-format-selected)
-nmap \f  <Plug>(coc-format-selected)
-nmap \ff  <Plug>(coc-format)
-" Add `:Format` command to format current buffer.
-command! -nargs=0 Format :call CocAction('format')
-
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Applying codeAction to the selected region.
-" Example: `<Leader>aap` for current paragraph
-xmap <Leader>a  <Plug>(coc-codeaction-selected)
-nmap <Leader>a  <Plug>(coc-codeaction-selected)
-" Remap keys for applying codeAction to the current buffer.
-nmap <Leader>aa  <Plug>(coc-codeaction)
-
-"kApply AutoFix to problem on the current line.
-nmap <Leader>cf  <Plug>(coc-fix-current)
-
-
-" Map function and class text objects
-" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
-xmap if <Plug>(coc-funcobj-i)
-omap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap af <Plug>(coc-funcobj-a)
-xmap ic <Plug>(coc-classobj-i)
-omap ic <Plug>(coc-classobj-i)
-xmap ac <Plug>(coc-classobj-a)
-omap ac <Plug>(coc-classobj-a)
-
-" Use CTRL-S for selections ranges.
-" Requires 'textDocument/selectionRange' support of LS, ex: coc-tsserver
-" nmap <silent> <C-s> <Plug>(coc-range-select)
-" xmap <silent> <C-s> <Plug>(coc-range-select)
-
-" Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call CocAction('runCommand', 'editor.action.organizeImport')
-
-" add C for CocConfig
-function! SetupCommandAbbrs(from, to)
-  exec 'cnoreabbrev <expr> '.a:from
-        \ .' ((getcmdtype() ==# ":" && getcmdline() ==# "'.a:from.'")'
-        \ .'? ("'.a:to.'") : ("'.a:from.'"))'
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" Use C to open coc config
-call SetupCommandAbbrs('C', 'CocConfig')
+let g:coc_snippet_next = '<tab>'
 
 
-" coc-fzf
+" === coc-fzf
 " let g:coc_fzf_preview = ''
 " let g:coc_fzf_opts = []
 let g:coc_fzf_preview = exists('g:fzf_preview_window') ? g:fzf_preview_window : 'right:60%'
@@ -502,7 +541,7 @@ nnoremap <silent> <Leader>fs :<C-u>CocFzfList symbols<CR>
 nnoremap <silent> <Leader>fF :<C-u>CocFzfList<CR>
 nnoremap <silent> <Leader>fo :<C-u>CocFzfList outline<CR>
 
-" coc-vista
+" === coc-vista
 let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 let g:vista#renderer#enable_icon = 0
 let g:vista_default_executive = 'ctags'

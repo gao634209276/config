@@ -87,7 +87,11 @@
   // "python.pythonPath": "/opt/miniconda3/envs/python3.8/bin/python",
   "python.pythonPath": "/opt/miniconda3/envs/py2.7/bin/python",
   "python.condaPath": "/opt/miniconda3/bin/conda",
-  "python.autoComplete.extraPaths": [],
+  // "python.venvPath": "/opt/miniconda3/envs",
+  "pyright.disableDiagnostics": false,
+  "pyright.completion.snippetSupport": true,
+  "pyright.organizeimports.provider": "pyright",
+  "pyright.enable": true,
   "clangd.enabled": true,
   "clangd.path": "clangd",
   "languageserver": {
